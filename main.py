@@ -2,15 +2,24 @@ import todoist
 import argparse
 import sys
 
-api = todoist.TodoistAPI("9e76745d59cbda40acc52841cf097d3950c1bbe7")
-api.sync()
-
 def todo(args):
     project_name = args.p
     add_item = args.a
     remove_item = args.r
     complete_item = args.c
+    api_key = args.set_api_key
     project_id = None
+
+    if api_key != None:
+        with open("key.txt", "w") as f:
+            f.write(api_key)
+
+    with open("key.txt", "r") as f:
+        key = f.read()
+
+    api = todoist.TodoistAPI(key)
+    api.sync()
+
     for project in api.state["projects"]:
         if project["name"] == project_name:
             project_id = project["id"]
@@ -47,6 +56,8 @@ def main():
     parser.add_argument("--r", type = str, default = None, help = "This is for if u would like to remove an item. Use --r + the name of the item you want to remove. Use --p to choose which project.")
 
     parser.add_argument("--c", type = str, default = None, help = "This is for if u would like to complete an item. Use --c + the name of the item you want to complete. Use --p to choose which project.")
+
+    parser.add_argument("--set-api-key", type = str, default = None, help = "use this to set your api key. Go to the todoist website. Go to settings and click on the integrations tab and the key will be at the botton of that page.")
 
     args = parser.parse_args()
     sys.stdout.write(str(todo(args)))
