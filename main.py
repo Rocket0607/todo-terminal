@@ -1,6 +1,7 @@
 import todoist
 import argparse
 import sys
+import os
 
 def todo(args):
     project_name = args.p
@@ -8,13 +9,14 @@ def todo(args):
     remove_item = args.r
     complete_item = args.c
     api_key = args.set_api_key
+    program_path = os.environ["HOME"]
     project_id = None
 
     if api_key != None:
-        with open("/home/rohitk/Documents/todo-terminal/key.txt", "w") as f:
+        with open(program_path + "/Documents/todo-terminal/key.txt", "w") as f:
             f.write(api_key)
 
-    with open("/home/rohitk/Documents/todo-terminal/key.txt", "r") as f:
+    with open(program_path + "/Documents/todo-terminal/key.txt", "r") as f:
         key = f.read()
 
     api = todoist.TodoistAPI(key)
@@ -58,6 +60,8 @@ def main():
     parser.add_argument("--c", type = str, default = None, help = "This is for if u would like to complete an item. Use --c + the name of the item you want to complete. Use --p to choose which project.")
 
     parser.add_argument("--set-api-key", type = str, default = None, help = "use this to set your api key. Go to the todoist website. Go to settings and click on the integrations tab and the key will be at the botton of that page.")
+
+    parser.add_argument("--set-program-path", type = str, default = None, help = "enter --set-program-path + path to where this program was installed. This is to help set your api key")
 
     args = parser.parse_args()
     sys.stdout.write(str(todo(args)))
