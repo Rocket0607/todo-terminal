@@ -9,6 +9,9 @@ def todo(args):
     remove_item = args.r
     complete_item = args.c
     new_project = args.ap
+    list_projects = args.lp
+    archived = args.archived
+    remove_project = args.rp
     api_key = args.set_api_key
     program_path = os.environ["HOME"]
     project_id = None
@@ -45,12 +48,32 @@ def todo(args):
                 item.complete()
                 api.commit()
 
+    if remove_project != None:
+        for project in api.projects.all():
+            if project["name"] == remove_project:
+                deleted_project = api.projects.get_by_id(project["id"])
+                deleted_project.delete()
+                api.commit()
+                list_projects = True
+
     if new_project != None:
         project = api.projects.add(new_project)
+        api.commit()
+        list_projects = True
+    
+    if list_projects and not archived:
+        for project in api.projects.all():
+            if project["is_archived"] == 0:
+                print(project["name"])
 
-    for item in api.items.all():
-        if item["checked"] == 0 and item["project_id"] == project_id:
-            print(item["content"])
+    elif list_projects and archived:
+        for project in api.projects.all():
+            print(project["name"])
+
+    else:
+        for item in api.items.all():
+            if item["checked"] == 0 and item["project_id"] == project_id:
+                print(item["content"])
 
 def main():
     parser = argparse.ArgumentParser()
@@ -61,7 +84,13 @@ def main():
 
     parser.add_argument("--r", type = str, default = None, help = "This is for if u would like to remove an item. Use --r + the name of the item you want to remove. Use --p to choose which project.")
 
-    parser.add_argument("--ap", type = str, default = None, help = "This is to add a project. Use --ap + name of the new project.")
+    parser.add_argument("--ap", type = str, default = None, help = "This is to add a new project. Use --ap + name of new project.")
+
+    parser.add_argument("--lp", action = "store_true", help = "This is to list all projects")
+
+    parser.add_argument("--archived", action = "store_true", help = "This is to list all projects")
+
+    parser.add_argument("--rp", type = str, default = None, help = "This is to remove a project. Use --rp + name of project.")
 
     parser.add_argument("--c", type = str, default = None, help = "This is for if u would like to complete an item. Use --c + the name of the item you want to complete. Use --p to choose which project.")
 
