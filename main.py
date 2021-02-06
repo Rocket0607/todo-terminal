@@ -8,6 +8,7 @@ def todo(args):
     add_item = args.a
     remove_item = args.r
     complete_item = args.c
+    new_project = args.ap
     api_key = args.set_api_key
     program_path = os.environ["HOME"]
     project_id = None
@@ -44,6 +45,9 @@ def todo(args):
                 item.complete()
                 api.commit()
 
+    if new_project != None:
+        project = api.projects.add(new_project)
+
     for item in api.items.all():
         if item["checked"] == 0 and item["project_id"] == project_id:
             print(item["content"])
@@ -56,6 +60,8 @@ def main():
     parser.add_argument("--a", type = str, default = None, help = "This is for if u would like to add an item. Use --a + the name of the item you would like to add. Use --p to choose which project.")
 
     parser.add_argument("--r", type = str, default = None, help = "This is for if u would like to remove an item. Use --r + the name of the item you want to remove. Use --p to choose which project.")
+
+    parser.add_argument("--ap", type = str, default = None, help = "This is to add a project. Use --ap + name of the new project.")
 
     parser.add_argument("--c", type = str, default = None, help = "This is for if u would like to complete an item. Use --c + the name of the item you want to complete. Use --p to choose which project.")
 
