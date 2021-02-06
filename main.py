@@ -11,10 +11,10 @@ def todo(args):
     project_id = None
 
     if api_key != None:
-        with open("~/Documents/todo-terminal/key.txt", "w") as f:
+        with open("/home/rohitk/Documents/todo-terminal/key.txt", "w") as f:
             f.write(api_key)
 
-    with open("~/Documents/todo-terminal/key.txt", "r") as f:
+    with open("/home/rohitk/Documents/todo-terminal/key.txt", "r") as f:
         key = f.read()
 
     api = todoist.TodoistAPI(key)
