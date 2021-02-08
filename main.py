@@ -1,5 +1,8 @@
 import todoist
 import argparse
+from colorama import Fore
+import datetime
+from datetime import date
 import sys
 import os
 
@@ -72,8 +75,16 @@ def todo(args):
 
     else:
         for item in api.items.all():
-            if item["checked"] == 0 and item["project_id"] == project_id:
-                print(item["content"])
+            if item != None:
+                if item["checked"] == 0 and item["project_id"] == project_id:
+                    if item["due"] != None:
+                        due_date = datetime.datetime.strptime(item["due"]["date"], "%Y-%m-%d")
+                        if date.today() > due_date.date():
+                            print(item["content"] + " | " + Fore.RED + item["due"]["string"])
+                        else:
+                            print(item["content"] + " | " + item["due"]["string"])
+                    else:
+                        print(item["content"] +" | "+ "No due date")
 
 def main():
     parser = argparse.ArgumentParser()
