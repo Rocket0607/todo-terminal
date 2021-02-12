@@ -9,6 +9,7 @@ import os
 def todo(args):
     project_name = args.p
     add_item = args.a
+    due_date = args.d
     remove_item = args.r
     complete_item = args.c
     new_project = args.ap
@@ -34,19 +35,28 @@ def todo(args):
             project_id = project["id"]
 
     if add_item != None:
-        item = api.items.add(add_item, project_id = project_id)
+        if due_date != None:
+           due_datetime = datetime.datetime.strptime(due_date, "%Y-%m-%d")
+           string_due = due_datetime.strftime("%b %d") 
+           due = {
+               "date": due_date,
+               "string": string_due
+           }
+        item = api.items.add(add_item, project_id = project_id, due = due)
         api.commit()
 
     if remove_item != None:
-        for item in api.items.all():
-            if item["checked"] == 0 and item["content"] == remove_item and item["project_id"] == project_id:
+        project  = api.projects.get_data(project_id)
+        for item in project["items"]:
+            if item["content"] == remove_item:
                 item = api.items.get_by_id(item["id"]) 
                 item.delete()
                 api.commit()
 
     if complete_item != None:
-        for item in api.items.all():
-            if item["content"] == complete_item and item["project_id"] == project_id:
+        project  = api.projects.get_data(project_id)
+        for item in project["items"]:
+            if item["content"] == complete_item:
                 item = api.items.get_by_id(item["id"]) 
                 item.complete()
                 api.commit()
@@ -74,17 +84,17 @@ def todo(args):
             print(project["name"])
 
     else:
-        for item in api.items.all():
+        project  = api.projects.get_data(project_id)
+        for item in project["items"]:
             if item != None:
-                if item["checked"] == 0 and item["project_id"] == project_id:
-                    if item["due"] != None:
-                        due_date = datetime.datetime.strptime(item["due"]["date"], "%Y-%m-%d")
-                        if date.today() > due_date.date():
-                            print(item["content"] + " | " + Fore.RED + item["due"]["string"])
-                        else:
-                            print(item["content"] + " | " + item["due"]["string"])
+                if item["due"] != None:
+                    due_date = datetime.datetime.strptime(item["due"]["date"], "%Y-%m-%d")
+                    if date.today() > due_date.date():
+                        print(item["content"] + " | " + Fore.RED + item["due"]["string"])
                     else:
-                        print(item["content"] +" | "+ "No due date")
+                        print(item["content"] + " | " + item["due"]["string"])
+                else:
+                    print(item["content"] +" | "+ "No due date")
 
 def main():
     parser = argparse.ArgumentParser()
@@ -107,7 +117,7 @@ def main():
 
     parser.add_argument("--set-api-key", type = str, default = None, help = "use this to set your api key. Go to the todoist website. Go to settings and click on the integrations tab and the key will be at the botton of that page.")
 
-    parser.add_argument("--set-program-path", type = str, default = None, help = "enter --set-program-path + path to where this program was installed. This is to help set your api key")
+    parser.add_argument("--d", type = str, default = None)
 
     args = parser.parse_args()
     sys.stdout.write(str(todo(args)))
