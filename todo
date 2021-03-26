@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import todoist
 import argparse
 from colorama import Fore
@@ -35,13 +37,18 @@ def todo(args):
             project_id = project["id"]
 
     if add_item != None:
-        if due_date != None:
+        if due_date == "6969-06-09":
+            print('nice')
+            due = None
+        elif due_date != None:
            due_datetime = datetime.datetime.strptime(due_date, "%Y-%m-%d")
            string_due = due_datetime.strftime("%b %d") 
            due = {
                "date": due_date,
                "string": string_due
            }
+        else:
+           due = None
         item = api.items.add(add_item, project_id = project_id, due = due)
         api.commit()
 
@@ -85,6 +92,7 @@ def todo(args):
 
     else:
         project  = api.projects.get_data(project_id)
+        print("Add Todo")
         for item in project["items"]:
             if item != None:
                 if item["due"] != None:
